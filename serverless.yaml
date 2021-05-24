@@ -1,0 +1,32 @@
+service:
+ name: nest-serverless-lambda-exchange-app
+
+plugins:
+ - 'serverless-plugin-typescript'
+ - serverless-plugin-optimize
+ - serverless-offline
+
+custom:
+  secrets: ${file(./secrets.yml):${self:provider.stage}}
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'prod'}
+  environment:
+    TYPE: ${self:custom.secrets.TYPE}
+    HOST: ${self:custom.secrets.HOST}
+    PORT: ${self:custom.secrets.PORT}
+    DB_USERNAME: ${self:custom.secrets.DB_USERNAME}
+    DB_PASSWORD: ${self:custom.secrets.DB_PASSWORD}
+    DB_NAME: ${self:custom.secrets.DB_NAME}
+    CRYPTO_COMPARE_KEY: ${self:custom.secrets.CRYPTO_COMPARE_KEY}
+
+functions:
+ main: # The name of the lambda function
+   # The module 'handler' is exported in the file 'src/lambda'
+   handler: src/lambda.handler
+   events:
+     - http:
+         method: any
+         path: /{any+}
